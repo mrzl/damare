@@ -1,5 +1,5 @@
 from os import listdir, remove, rename, makedirs
-from os.path import isfile, join, isdir
+from os.path import isfile, join, isdir, getmtime
 import sys
 import time
 import subprocess
@@ -69,7 +69,7 @@ class Scheduler(object):
         rename(src, dst)
 
     def run(self):
-        script = self.scripts[0]
+        script = self.scripts[0][0]
         script_to_run = join(self._jobs_path, script)
 
         try:
@@ -100,25 +100,12 @@ class Scheduler(object):
         # remove lock file
         sys.exit(1)
 
-    @staticmethod
-    def sort(file_names):
-        to_sort = []
-
+    def sort(self, file_names):
+        sort_me = {}
         for filename in file_names:
-            try:
-                tmp = filename[4:]
-                tmp = tmp[:-3]
-                utc = int(tmp)
-                to_sort.append(utc)
-            except ValueError as e:
-                print("ValueError: {0}".format(e))
+            sort_me[filename] = getmtime(join(self._jobs_path, filename))
 
-        to_sort.sort()
-        sorted_scripts = []
-
-        for s in to_sort:
-            sorted_scripts.append('job_' + str(s) + '.sh')
-
+        sorted_scripts = [(k, sort_me[k]) for k in sorted(sort_me, key=sort_me.get, reverse=False)]
         return sorted_scripts
 
 if __name__ == '__main__':
