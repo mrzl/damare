@@ -20,6 +20,14 @@ class Scheduler(object):
         self._lock_file = join(self._jobs_path, 'lock.lck')
         self._finished_path = join(self._jobs_path, 'done')
         self._failed_path = join(self._jobs_path, 'failed')
+
+        if not isdir(self._jobs_path):
+            makedirs(self._jobs_path)
+        if not isdir(self._finished_path):
+            makedirs(self._finished_path)
+        if not isdir(self._failed_path):
+            makedirs(self._failed_path)
+
         self.sorted_scripts = []
 
         if self.is_locked():
