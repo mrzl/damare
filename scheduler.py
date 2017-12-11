@@ -36,8 +36,6 @@ class Scheduler(object):
         if not isdir(self._failed_path):
             makedirs(self._failed_path)
 
-        self.sorted_scripts = []
-
         if self.is_locked():
             print('locked: still running')
             sys.exit(0)
@@ -94,7 +92,7 @@ class Scheduler(object):
                 self.unlock()
                 self.move_job(script_to_run, self._finished_path, script)
             else:
-                # unlock and
+                # unlock and move job to failed
                 if self.continue_on_fail:
                     self.unlock()
                     self.move_job(script_to_run, self._failed_path, script)
