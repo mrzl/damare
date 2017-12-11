@@ -7,10 +7,17 @@ import subprocess
 
 class Scheduler(object):
     """
-    python3 'cause of subprocess.run
+    a bash file scheduler in python3
 
-    job files have the following convention
-    job_1355563265.sh (job_ + time.time() + .sh)
+    it makes sure that only one job is running at a time
+
+    should be added as a cronjob (crontab -e)
+    (* * * * * python3 /opt/scheduler/scheduler.py >> /opt/scheduler/cron.log)
+
+    jobs are bash files in /opt/scheduler/jobs/
+    they'll will be run according to the modification date of the file
+
+    done/failed jobs will be moved to a done/failed subfolder
     """
     def __init__(self):
         self.continue_on_fail = True
@@ -65,7 +72,7 @@ class Scheduler(object):
         if isfile(dst):
             # if destination file already exists,
             # append current timestamp in order to not overwrite
-            dst += str(time.time())
+            dst += str(int(time.time()))
         rename(src, dst)
 
     def run(self):
@@ -97,7 +104,6 @@ class Scheduler(object):
 
     @staticmethod
     def cleanup():
-        # remove lock file
         sys.exit(1)
 
     def sort(self, file_names):
