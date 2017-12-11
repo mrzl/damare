@@ -53,7 +53,12 @@ class Scheduler(object):
     def move_job(self, src, dstdir, dstfile):
         if not isdir(dstdir):
             makedirs(dstdir)
-        rename(src, join(dstdir, dstfile))
+        dst = join(dstdir, dstfile)
+        if isfile(dst):
+            # if destination file already exists,
+            # append current timestamp in order to not overwrite
+            dst += str(time.time())
+        rename(src, dst)
 
     def run(self):
         script = self.scripts[0]
