@@ -1,5 +1,5 @@
-from os import listdir, remove, rename
-from os.path import isfile, join
+from os import listdir, remove, rename, makedirs
+from os.path import isfile, join, isdir
 import sys
 import time
 import subprocess
@@ -7,15 +7,19 @@ import subprocess
 
 class Scheduler(object):
     """
+    python3 'cause of subprocess.run
+
     job files have the following convention
     job_1355563265.sh (job_ + time.time() + .sh)
     """
     def __init__(self):
-        #self._path = '/home/marcel/jobs/'
-        self._jobs_path = '/home/mar/jobs/'
+        self.continue_on_fail = True
+        self._jobs_path = '/opt/scheduler/jobs/'
+        #self._jobs_path = '/home/mar/jobs/'
         self._log_file = join(self._jobs_path, 'log.txt')
         self._lock_file = join(self._jobs_path, 'lock.lck')
         self._finished_path = join(self._jobs_path, 'done')
+        self._failed_path = join(self._jobs_path, 'failed')
         self.sorted_scripts = []
 
         if self.is_locked():
@@ -24,7 +28,8 @@ class Scheduler(object):
 
         try:
             files = [f for f in listdir(self._jobs_path) if isfile(join(self._jobs_path, f))]
-            self.scripts = [x for x in files if x.endswith('.sh')]
+            self.scripts = [x for x in files if x.endswith('.sh') and 'job_' in x]
+            self.scripts = self.sort(self.scripts)
 
             # no scripts found, abort
             if len(self.scripts) is 0:
@@ -45,20 +50,33 @@ class Scheduler(object):
         print('unlocking')
         remove(self._lock_file)
 
+    def move_job(self, src, dstdir, dstfile):
+        if not isdir(dstdir):
+            makedirs(dstdir)
+        rename(src, join(dstdir, dstfile))
+
     def run(self):
         script = self.scripts[0]
         script_to_run = join(self._jobs_path, script)
 
         try:
             self.lock()
-            success = subprocess.call([script_to_run])
             with open(self._log_file, 'a') as f:
                 iso_time = time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(time.time()))
-                f.write(iso_time + ': ' + script_to_run + ' with return ' + str(success) + '\n')
+                f.write(iso_time + ': ' + script_to_run + ' started\n')
+            success = subprocess.run([script_to_run])
+            with open(self._log_file, 'a') as f:
+                iso_time = time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(time.time()))
+                f.write(iso_time + ': ' + str(success) + '\n')
 
-            if success is 0:
+            if success.returncode is 0:
                 self.unlock()
-                rename(script_to_run, join(self._finished_path, script))
+                self.move_job(script_to_run, self._finished_path, script)
+            else:
+                # unlock and
+                if self.continue_on_fail:
+                    self.unlock()
+                    self.move_job(script_to_run, self._failed_path, script)
 
         except OSError as e:
             print("OS error in run(): {0}".format(e))
