@@ -16,6 +16,7 @@ class Scheduler(object):
 
     jobs are bash files in /opt/scheduler/jobs/
     they'll will be run according to the modification date of the file
+    make sure they are executable (chmod a+x job.sh)
 
     done/failed jobs will be moved to a done/failed subfolder
     """
