@@ -9,7 +9,7 @@ class FabricHelper(object):
         cfg = configparser.ConfigParser()
         cfg.read("settings.ini")
 
-        self._host =cfg.get("lyrik", "host")
+        self._host = cfg.get("lyrik", "host")
         self._key = cfg.get("lyrik", "key")
         self._home_dir = cfg.get("lyrik", "home_dir")
         self._password = cfg.get("lyrik", "password")
@@ -32,7 +32,6 @@ class FabricHelper(object):
         disconnect_all()
 
     def capture(self):
-        pass
-        #with settings(hide('running', 'commands', 'stdout', 'stderr')):
-        #    stdout = execute(self.parallel_exec, hosts=self.hosts)
-        #return stdout
+        with settings(hide('running', 'commands', 'stdout', 'stderr')):
+            stdout = execute(self.uname, hosts=self._host)
+        return stdout
