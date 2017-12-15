@@ -65,7 +65,7 @@ class Lyrik(object):
         self.fabric.chmod(style_job_path, 'a+x')
 
     def render(self, content_video, style_file, resolution, do_waifu, fps):
-        style = style_file[:-4]
+        style = style_file[:-3]
         video = content_video[:-4]
 
         render_job_filename = 'render_' + style + '_' + video + '_' + fps

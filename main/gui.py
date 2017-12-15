@@ -67,6 +67,7 @@ class Window(object):
             style_size = self.image_size_entry.get()
             content_weight = self.content_weight_entry.get()
             style_weight = self.style_weight_entry.get()
+            self.logger('training: ' + style_image + ' ' + style_size + ' ' + content_weight + ' ' + style_weight)
             self.lyrik.train(style_image, style_size, content_weight, style_weight)
 
         # train button
@@ -120,7 +121,7 @@ class Window(object):
             resolution = self.resolution_entry.get()
             waifu = self.do_waifu.get()
             fps = self.output_fps_entry.get()
-            self.logger(content + ' ' + style + ' ' + resolution + ' ' + waifu + ' ' + fps)
+            self.logger('rendering: ' + content + ' ' + style + ' ' + resolution + ' ' + str(waifu) + ' ' + fps)
             self.lyrik.render(content, style, resolution, waifu, fps)
 
         # render button
