@@ -1,5 +1,6 @@
 import configparser
 from fabric.api import run, cd, env, put
+from fabric.exceptions import NetworkError
 from fabric.network import disconnect_all
 
 
@@ -16,10 +17,15 @@ class FabricHelper(object):
         env.host_string = self._host
         env.key_filename = self._key
         env.password = self._password
+
+        self.ERROR = 'NetworkError'
         #with cd(self._home_dir):
 
-    def upload(self, origin, destination):
-        put(origin, destination, use_sudo=False, mirror_local_mode=True)
+    async def upload(self, origin, destination):
+        try:
+            await put(origin, destination, use_sudo=False, mirror_local_mode=True)
+        except NetworkError as e:
+            print(e)
 
     def uname(self):
         return run("uname -a")
@@ -34,7 +40,11 @@ class FabricHelper(object):
         """
         returns a list of absolute paths of files in the dir
         """
-        string = run("for i in %s*; do echo $i; done" % dir)
+        try:
+            string = run("for i in %s*; do echo $i; done" % dir)
+        except NetworkError as e:
+            print(e)
+            return [self.ERROR]
         return string.replace("\r", "").split("\n")
 
     def disconnect(self):

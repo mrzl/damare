@@ -16,7 +16,7 @@ class Lyrik(object):
         file_list = self.fabric.ls(self.style_model_folder)
         only_t7_files = []
         for f in file_list:
-            if f.endswith('.t7'):
+            if f.endswith('.t7') or self.fabric.ERROR in f:
                 path, file = os.path.split(f)
                 only_t7_files.append(file)
 
@@ -26,15 +26,15 @@ class Lyrik(object):
         file_list = self.fabric.ls(self.style_images_folder)
         only_images = []
         for f in file_list:
-            if f.endswith('.jpg') or f.endswith('.png'):
+            if f.endswith('.jpg') or f.endswith('.png')or self.fabric.ERROR in f:
                 path, file = os.path.split(f)
                 only_images.append(file)
 
         return only_images
 
-    def upload(self, destination_dir, files):
+    async def upload(self, destination_dir, files):
         for file in files:
-            self.fabric.upload(file, destination_dir)
+            await self.fabric.upload(file, destination_dir)
 
     def uname(self):
         return self.fabric.uname()

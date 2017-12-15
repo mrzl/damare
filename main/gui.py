@@ -18,9 +18,8 @@ class Window(object):
 
         #self.sync_images()
 
-        self.event_loop = asyncio.get_event_loop()
+        self.event_loop = asyncio.new_event_loop()
         sync_task = self.event_loop.create_task(self.sync_images())
-        self.event_loop.run_until_complete(sync_task)
 
         self.root = tk.Tk()
         self.frame = tk.Frame(self.root, width=100, height=100)
@@ -43,7 +42,7 @@ class Window(object):
         model_files = self.lyrik.models()
 
         self.selected_model_file = tk.StringVar(self.frame)
-        self.selected_model_file.set(model_files[0])  # default value
+        self.selected_model_file.set('Choose Model')  # default value
 
         self._models = tk.OptionMenu(self.frame, self.selected_model_file, *model_files)
         self._models.pack()
@@ -57,6 +56,7 @@ class Window(object):
         self.frame.pack()
 
         self.root.mainloop()
+        self.event_loop.run_until_complete(sync_task)
 
     def quit(self, ev):
         self.lyrik.disconnect()
@@ -97,6 +97,11 @@ class Window(object):
 
     async def sync_images(self):
         lyrik_images = self.lyrik.style_images()
+
+        if self.lyrik.fabric.ERROR in lyrik_images:
+            print('Not syncing, no connection to Lyrik.')
+            return
+
         local_images = self.local.style_images()
 
         lyrik_missing = list(set(local_images) - set(lyrik_images))
