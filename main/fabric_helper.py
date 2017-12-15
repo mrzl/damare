@@ -28,7 +28,7 @@ class FabricHelper(object):
         return run("pip -V")
 
     def echo(self, file_path, str):
-        return run('echo \"' + str + '\" > ' + file_path)
+        return run('echo \"' + str + '\" >> ' + file_path)
 
     def touch(self, file_path):
         return run('touch ' + file_path)
