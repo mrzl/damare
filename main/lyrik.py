@@ -45,7 +45,12 @@ class Lyrik(object):
         style_job_filename = 'train_' + style + '.sh'
         style_job_path = os.path.join(self.scheduler_jobs_folder, style_job_filename)
         self.fabric.touch(style_job_path)
-        self.fabric.echo(style_job_path, '#!/bin/sh\nsource /home/marcel/.bashrc\n\ncd ~/devel/fast-neural-style/\n/mnt/drive1/tools/torch2/install/bin/th train.lua -h5_file '+self.style_model_folder + 'new_trained_output_all_coco.h5 -style_image ' + self.style_images_folder + style_image+' -style_image_size ' + style_size+' -content_weights ' + content_weight+' -style_weights ' + style_weight+' -checkpoint_name ' + style+' -gpu 0\n')
+        self.fabric.echo(style_job_path, '#!/bin/sh\nsource /home/marcel/.bashrc\n\ncd '
+                                         '~/devel/fast-neural-style/\n/mnt/drive1/tools/torch2/install/bin/th '
+                                         'train.lua -h5_file '+self.style_model_folder +
+                                         'new_trained_output_all_coco.h5 -style_image ' + self.style_images_folder
+                         + style_image+' -style_image_size ' + style_size+' -content_weights '
+                         + content_weight+' -style_weights ' + style_weight+' -checkpoint_name ' + style+' -gpu 0\n')
         self.fabric.chmod(style_job_path, 'a+x')
 
     async def upload(self, destination_dir, files):
