@@ -28,37 +28,37 @@ class Window(object):
         self.topLabel = tk.Label(self.root, text="黙れ—左", font=("Helvetica", 26)).grid(row=0, column=0, columnspan=3)
 
         # topic for the train section
-        self.train_topic = tk.Label(self.root, text="train").grid(row=1, column=0)
+        self.train_topic = tk.Label(self.root, text="仕込む").grid(row=1, column=0)
 
         # line to select the host
-        self.host_label = tk.Label(self.root, text="host").grid(row=2, column=0)
-        self.host_entry = tk.Entry(self.root)
-        self.host_entry.grid(row=2, column=1)
-        self.host_entry.delete(0, tk.END)
-        self.host_entry.insert(0, self.lyrik.host)
+        self.host_label_train = tk.Label(self.root, text="サーバ").grid(row=2, column=0)
+        self.host_entry_train = tk.Entry(self.root)
+        self.host_entry_train.grid(row=2, column=1)
+        self.host_entry_train.delete(0, tk.END)
+        self.host_entry_train.insert(0, self.lyrik.host)
 
         # line to select the style file itself
-        self.style_label = tk.Label(self.root, text="style").grid(row=3, column=0)
+        self.style_label = tk.Label(self.root, text="型").grid(row=3, column=0)
         self.selected_style = tk.StringVar(self.root)
         self.selected_style.set('choose')
         self.styles_chooser = tk.OptionMenu(self.root, self.selected_style, *self.lyrik.style_images()).grid(row=3, column=1)
 
         # line to select the image size for the training
-        self.image_size_label = tk.Label(self.root, text="image size").grid(row=4, column=0)
+        self.image_size_label = tk.Label(self.root, text="画像サイズ").grid(row=4, column=0)
         self.image_size_entry = tk.Entry(self.root)
         self.image_size_entry.grid(row=4, column=1)
         self.image_size_entry.delete(0, tk.END)
         self.image_size_entry.insert(0, 1080)
 
         # line to select the content weight for the training
-        self.content_weight_label = tk.Label(self.root, text="content weight").grid(row=5, column=0)
+        self.content_weight_label = tk.Label(self.root, text="コンテンツの重み").grid(row=5, column=0)
         self.content_weight_entry = tk.Entry(self.root)
         self.content_weight_entry.grid(row=5, column=1)
         self.content_weight_entry.delete(0, tk.END)
         self.content_weight_entry.insert(0, 1.0)
 
         # line to select the style weight for the training
-        self.style_weight_label = tk.Label(self.root, text="style weight").grid(row=6, column=0)
+        self.style_weight_label = tk.Label(self.root, text="スタイルウェイト").grid(row=6, column=0)
         self.style_weight_entry = tk.Entry(self.root)
         self.style_weight_entry.grid(row=6, column=1)
         self.style_weight_entry.delete(0, tk.END)
@@ -72,28 +72,63 @@ class Window(object):
             self.lyrik.train(style_image, style_size, content_weight, style_weight)
 
         # train button
-        self.train_button = tk.Button(self.root, text='train!', command=train).grid(row=7, column=2)
+        self.train_button = tk.Button(self.root, text='仕込む!', command=train).grid(row=7, column=2)
 
+        # topic for the render section
+        self.render_topic = tk.Label(self.root, text="描く").grid(row=9, column=0)
 
-        #self.e = tk.Entry(self.frame, width=50)
+        # line to select the host
+        self.host_label_render = tk.Label(self.root, text="サーバ").grid(row=10, column=0)
+        self.host_entry_render = tk.Entry(self.root)
+        self.host_entry_render.grid(row=10, column=1)
+        self.host_entry_render.delete(0, tk.END)
+        self.host_entry_render.insert(0, self.lyrik.host)
 
-        #self.e.delete(0, tk.END)
-        #self.e.insert(0, "/home/mar/Downloads/changi02.jpg")
+        # line to select the model file itself
+        self.model_label = tk.Label(self.root, text="型").grid(row=11, column=0)
+        self.selected_model = tk.StringVar(self.root)
+        self.selected_model.set('choose')
+        self.model_chooser = tk.OptionMenu(self.root, self.selected_model, *self.lyrik.models()).grid(row=11, column=1)
 
-        #self.runButton = tk.Button(self.frame, text="走る (run)", command=self.button_cb)
+        # line to select the content video
+        self.content_label = tk.Label(self.root, text="ビデオ").grid(row=12, column=0)
+        self.selected_video = tk.StringVar(self.root)
+        self.selected_video.set('choose')
+        self.video_chooser = tk.OptionMenu(self.root, self.selected_video, *self.lyrik.content_videos()).grid(row=12, column=1)
 
-        #self.imageButton = tk.Button(self.frame, text="画像 (image)", command=self.local_image_cb)
+        # line to select the resolution
+        self.resolution_label = tk.Label(self.root, text="解像度").grid(row=13, column=0)
+        self.resolution_entry = tk.Entry(self.root)
+        self.resolution_entry.grid(row=13, column=1)
+        self.resolution_entry.delete(0, tk.END)
+        self.resolution_entry.insert(0, "960:540")
 
-        #model_files = self.lyrik.models()
+        # line to configure waifu2x
+        self.waifu_label = tk.Label(self.root, text="高級").grid(row=14, column=0)
+        self.do_waifu = tk.BooleanVar(self.root)
+        self.waifu_checkbox = tk.Checkbutton(self.root, variable=self.do_waifu)
+        self.waifu_checkbox.grid(row=14, column=1)
 
-        #self.selected_model_file = tk.StringVar(self.frame)
-        #self.selected_model_file.set('Choose Model')  # default value
+        # line to configure the output video fps
+        self.outputfps_label = tk.Label(self.root, text="間隔").grid(row=15, column=0)
+        self.output_fps_entry = tk.Entry(self.root)
+        self.output_fps_entry.grid(row=15, column=1)
+        self.output_fps_entry.delete(0, tk.END)
+        self.output_fps_entry.insert(0, '60')
 
-        #self._models = tk.OptionMenu(self.frame, self.selected_model_file, *model_files)
+        def render():
+            content = self.selected_video.get()
+            style = self.selected_model.get()
+            resolution = self.resolution_entry.get()
+            waifu = self.do_waifu.get()
+            fps = self.output_fps_entry.get()
+            self.lyrik.render(content, style, resolution, waifu, fps)
 
-        #self.modelButton = tk.Button(self.frame, text="型 (model)", command=self.check_model)
+        # render button
+        self.render_button = tk.Button(self.root, text='描く!', command=render).grid(row=16, column=2)
 
-        #self.log = tk.Text(self.frame, height=10, width=120)
+        self.log = tk.Text(self.root, height=10, width=80)
+        self.log.grid(row=20, column=0, columnspan=3)
 
         self.root.mainloop()
 

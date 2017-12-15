@@ -18,6 +18,7 @@ class Lyrik(object):
         self.style_images_folder = '/home/marcel/drive/marcel/damare/1_FAST_NEURAL_STYLE_IMAGES/'
         self.content_videos_folder = '/home/marcel/drive/marcel/damare/2_CONTENT_VIDEOS/'
         self.finished_videos_folder = '/home/marcel/drive/marcel/damare/3_FINISHED/'
+        self._fast_artistic_style_folder = '/home/marcel/devel/fast-artistic-videos/'
         self.scheduler_jobs_folder = '/opt/scheduler/jobs/'
 
     def models(self):
@@ -34,11 +35,21 @@ class Lyrik(object):
         file_list = self.fabric.ls(self.style_images_folder)
         only_images = []
         for f in file_list:
-            if f.endswith('.jpg') or f.endswith('.png')or self.fabric.ERROR in f:
+            if f.endswith('.jpg') or f.endswith('.png') or self.fabric.ERROR in f:
                 path, file = os.path.split(f)
                 only_images.append(file)
 
         return only_images
+
+    def content_videos(self):
+        file_list = self.fabric.ls(self.content_videos_folder)
+        only_videos = []
+        for f in file_list:
+            if f.endswith('.mp4') or f.endswith('.mov') or self.fabric.ERROR in f:
+                path, file = os.path.split(f)
+                only_videos.append(file)
+
+        return only_videos
 
     def train(self, style_image, style_size, content_weight, style_weight):
         style = style_image[:-4]
@@ -52,6 +63,27 @@ class Lyrik(object):
                          + style_image+' -style_image_size ' + style_size+' -content_weights '
                          + content_weight+' -style_weights ' + style_weight+' -checkpoint_name ' + style+' -gpu 0\n')
         self.fabric.chmod(style_job_path, 'a+x')
+
+    def render(self, content_video, style_file, resolution, do_waifu, fps):
+        style = style_file[:-4]
+        video = content_video[:-4]
+
+        render_job_filename = 'render_' + style + '_' + video + '_' + fps
+
+        www = ''
+
+        if do_waifu:
+            www += '_waifued'
+
+        render_job_filename += www
+        render_job_filename += '.sh'
+
+        resolution_split = resolution.split(':')
+
+        render_job_path = os.path.join(self.scheduler_jobs_folder, render_job_filename)
+        self.fabric.touch(render_job_path)
+        self.fabric.echo(render_job_path, '#!/bin/bash\nsource /home/marcel/.bashrc\n\ncd' + self._fast_artistic_style_folder + '\nbash fast_stylize.sh '+self.content_videos_folder+content_video+' ' +self.style_model_folder+style_file+'\nbash opt_flow.sh '+video+'/frame_%06d.ppm '+video+'/flow_'+resolution_split[0]+'\\:'+resolution_split[1]+'/\nbash make_video.sh '+self.content_videos_folder+content_video+'\n\ncd /home/marcel/devel/waifu2x/\nfind '+self._fast_artistic_style_folder+video+'/ -name "out-*.png" | sort > image_list_temp.txt\nmkdir '+self._fast_artistic_style_folder+video+'/high\n\n/mnt/drive1/tools/torch2/install/bin/th waifu2x.lua -m noise_scale -noise_level 3 -force_cudnn 1 -l ./image_list_temp.txt -o '+self._fast_artistic_style_folder+video+'/high/out_high_%06d.png\n\n/usr/bin/ffmpeg -y -framerate '+fps + ' -i '+self._fast_artistic_style_folder+'/high/out_high_%06d.png '+self.finished_videos_folder+style+'_'+video+www+'_'+fps+'.mp4\n\nrm -r '+self._fast_artistic_style_folder+video+'\nrm -r '+self._fast_artistic_style_folder+video+'_1\nrm '+self._fast_artistic_style_folder+video+'-stylized.mp4\n')
+        self.fabric.chmod(render_job_path, 'a+x')
 
     async def upload(self, destination_dir, files):
         for file in files:
