@@ -16,47 +16,83 @@ class Window(object):
         self.lyrik = Lyrik()
         self.local = Local()
 
-        #self.sync_images()
+        self.sync_images()
 
         self.event_loop = asyncio.new_event_loop()
         sync_task = self.event_loop.create_task(self.sync_images())
 
         self.root = tk.Tk()
-        self.frame = tk.Frame(self.root, width=100, height=100)
-
-        self.topLabel = tk.Label(self.frame, text="黙れ—左", font=("Helvetica", 26))
-        self.topLabel.pack()
-
-        self.e = tk.Entry(self.frame, width=50)
-        self.e.pack()
-
-        self.e.delete(0, tk.END)
-        self.e.insert(0, "/home/mar/Downloads/changi02.jpg")
-
-        self.runButton = tk.Button(self.frame, text="走る (run)", command=self.button_cb)
-        self.runButton.pack()
-
-        self.imageButton = tk.Button(self.frame, text="画像 (image)", command=self.local_image_cb)
-        self.imageButton.pack()
-
-        model_files = self.lyrik.models()
-
-        self.selected_model_file = tk.StringVar(self.frame)
-        self.selected_model_file.set('Choose Model')  # default value
-
-        self._models = tk.OptionMenu(self.frame, self.selected_model_file, *model_files)
-        self._models.pack()
-
-        self.modelButton = tk.Button(self.frame, text="型 (model)", command=self.check_model)
-        self.modelButton.pack()
-
-        self.log = tk.Text(self.frame, height=10, width=120)
-        self.log.pack(side=tk.BOTTOM)
+        self.root.title('黙れ—左')
         self.root.bind("<Escape>", self.quit)
-        self.frame.pack()
+
+        self.topLabel = tk.Label(self.root, text="黙れ—左", font=("Helvetica", 26)).grid(row=0, column=0, columnspan=3)
+
+        # topic for the train section
+        self.train_topic = tk.Label(self.root, text="train").grid(row=1, column=0)
+
+        # line to select the host
+        self.host_label = tk.Label(self.root, text="host").grid(row=2, column=0)
+        self.host_entry = tk.Entry(self.root)
+        self.host_entry.grid(row=2, column=1)
+        self.host_entry.delete(0, tk.END)
+        self.host_entry.insert(0, self.lyrik.host)
+
+        # line to select the style file itself
+        self.style_label = tk.Label(self.root, text="style").grid(row=3, column=0)
+        self.selected_style = tk.StringVar(self.root)
+        self.selected_style.set('choose')
+        self.styles_chooser = tk.OptionMenu(self.root, self.selected_style, *self.lyrik.style_images()).grid(row=3, column=1)
+
+        # line to select the image size for the training
+        self.image_size_label = tk.Label(self.root, text="image size").grid(row=4, column=0)
+        self.image_size_entry = tk.Entry(self.root)
+        self.image_size_entry.grid(row=4, column=1)
+        self.image_size_entry.delete(0, tk.END)
+        self.image_size_entry.insert(0, 1080)
+
+        # line to select the content weight for the training
+        self.content_weight_label = tk.Label(self.root, text="content weight").grid(row=5, column=0)
+        self.content_weight_entry = tk.Entry(self.root)
+        self.content_weight_entry.grid(row=5, column=1)
+        self.content_weight_entry.delete(0, tk.END)
+        self.content_weight_entry.insert(0, 1.0)
+
+        # line to select the style weight for the training
+        self.style_weight_label = tk.Label(self.root, text="style weight").grid(row=6, column=0)
+        self.style_weight_entry = tk.Entry(self.root)
+        self.style_weight_entry.grid(row=6, column=1)
+        self.style_weight_entry.delete(0, tk.END)
+        self.style_weight_entry.insert(0, 5.0)
+
+        def train():
+            # do training
+            pass
+
+        # train button
+        self.train_button = tk.Button(self.root, text='train!', command=train).grid(row=7, column=2)
+
+
+        #self.e = tk.Entry(self.frame, width=50)
+
+        #self.e.delete(0, tk.END)
+        #self.e.insert(0, "/home/mar/Downloads/changi02.jpg")
+
+        #self.runButton = tk.Button(self.frame, text="走る (run)", command=self.button_cb)
+
+        #self.imageButton = tk.Button(self.frame, text="画像 (image)", command=self.local_image_cb)
+
+        #model_files = self.lyrik.models()
+
+        #self.selected_model_file = tk.StringVar(self.frame)
+        #self.selected_model_file.set('Choose Model')  # default value
+
+        #self._models = tk.OptionMenu(self.frame, self.selected_model_file, *model_files)
+
+        #self.modelButton = tk.Button(self.frame, text="型 (model)", command=self.check_model)
+
+        #self.log = tk.Text(self.frame, height=10, width=120)
 
         self.root.mainloop()
-        self.event_loop.run_until_complete(sync_task)
 
     def quit(self, ev):
         self.lyrik.disconnect()
@@ -64,15 +100,15 @@ class Window(object):
         sys.exit(0)
 
     def button_cb(self):
-        print(self.e.get())
-        self.log.insert(tk.END, self.lyrik.uname() + "\n")
-        self.log.pack()
-        tk.Tk.update(self.root)
-        self.log.insert(tk.END, self.lyrik.python_version() + "\n")
-        self.log.pack()
-        tk.Tk.update(self.root)
-        self.log.insert(tk.END, self.lyrik.pip_version() + "\n")
-        self.log.pack()
+        #print(self.e.get())
+        #self.log.insert(tk.END, self.lyrik.uname() + "\n")
+        #self.log.pack()
+        #tk.Tk.update(self.root)
+        #self.log.insert(tk.END, self.lyrik.python_version() + "\n")
+        #self.log.pack()
+        #tk.Tk.update(self.root)
+        #self.log.insert(tk.END, self.lyrik.pip_version() + "\n")
+        #self.log.pack()
         tk.Tk.update(self.root)
 
     def check_model(self):

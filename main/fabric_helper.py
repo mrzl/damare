@@ -1,22 +1,13 @@
-import configparser
 from fabric.api import run, cd, env, put
 from fabric.exceptions import NetworkError
 from fabric.network import disconnect_all
 
 
 class FabricHelper(object):
-    def __init__(self):
-        cfg = configparser.ConfigParser()
-        cfg.read('settings.ini')
-
-        self._host = cfg.get('lyrik', 'host')
-        self._key = cfg.get('lyrik', 'key')
-        self._home_dir = cfg.get('lyrik', 'home_dir')
-        self._password = cfg.get('lyrik', 'password')
-
-        env.host_string = self._host
-        env.key_filename = self._key
-        env.password = self._password
+    def __init__(self, host, key, password):
+        env.host_string = host
+        env.key_filename = key
+        env.password = password
 
         self.ERROR = 'NetworkError'
         #with cd(self._home_dir):

@@ -1,11 +1,18 @@
 from fabric_helper import FabricHelper
+import configparser
 
 import os
 
 
 class Lyrik(object):
     def __init__(self):
-        self.fabric = FabricHelper()
+        cfg = configparser.ConfigParser()
+        cfg.read('settings.ini')
+        self.host = cfg.get('lyrik', 'host')
+        self.key = cfg.get('lyrik', 'key')
+        self.password = cfg.get('lyrik', 'password')
+
+        self.fabric = FabricHelper(self.host, self.key, self.password)
 
         self.style_model_folder = '/home/marcel/drive/marcel/damare/0_FAST_NEURAL_STYLE_MODELS/'
         self.style_images_folder = '/home/marcel/drive/marcel/damare/1_FAST_NEURAL_STYLE_IMAGES/'
