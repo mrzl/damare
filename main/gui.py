@@ -1,6 +1,4 @@
 import tkinter as tk
-from tkinter.filedialog import askopenfilename
-from tkinter.messagebox import showerror
 
 import os
 import sys
@@ -16,10 +14,10 @@ class Window(object):
         self.lyrik = Lyrik()
         self.local = Local()
 
-        self.sync_images()
+        self.sync_images_to_lyrik()
 
         self.event_loop = asyncio.new_event_loop()
-        sync_task = self.event_loop.create_task(self.sync_images())
+        sync_task = self.event_loop.create_task(self.sync_images_to_lyrik())
 
         self.root = tk.Tk()
         self.root.title('黙れ—左')
@@ -122,6 +120,7 @@ class Window(object):
             resolution = self.resolution_entry.get()
             waifu = self.do_waifu.get()
             fps = self.output_fps_entry.get()
+            self.logger(content + ' ' + style + ' ' + resolution + ' ' + waifu + ' ' + fps)
             self.lyrik.render(content, style, resolution, waifu, fps)
 
         # render button
@@ -137,9 +136,9 @@ class Window(object):
         self.event_loop.close()
         sys.exit(0)
 
-    def button_cb(self):
+    def logger(self, msg):
         #print(self.e.get())
-        #self.log.insert(tk.END, self.lyrik.uname() + "\n")
+        self.log.insert(tk.END, msg+'\n')
         #self.log.pack()
         #tk.Tk.update(self.root)
         #self.log.insert(tk.END, self.lyrik.python_version() + "\n")
@@ -149,27 +148,7 @@ class Window(object):
         #self.log.pack()
         tk.Tk.update(self.root)
 
-    def check_model(self):
-        print(self.selected_model_file.get())
-
-    def local_image_cb(self):
-        fname = askopenfilename(
-            filetypes=(
-                ("All files", "*.*"),
-                ("Image files", "*.jpg;*.jpeg;*.png")
-            ),
-            initialdir=(os.path.expanduser('~/'))
-        )
-        if fname:
-            try:
-                self.e.delete(0, tk.END)
-                self.e.insert(0, fname)
-                self.e.pack()
-            except:  # <- naked except is a bad idea
-                showerror("Open Source File", "Failed to read file\n'%s'" % fname)
-            return
-
-    async def sync_images(self):
+    async def sync_images_to_lyrik(self):
         lyrik_images = self.lyrik.style_images()
 
         if self.lyrik.fabric.ERROR in lyrik_images:
@@ -183,3 +162,18 @@ class Window(object):
         lyrik_missing = [os.path.join(self.local.images_folder, fn) for fn in lyrik_missing]
 
         self.lyrik.upload(self.lyrik.style_images_folder, lyrik_missing)
+
+    async def sync_videos_to_lyrik(self):
+        lyrik_videos = self.lyrik.content_videos()
+
+        if self.lyrik.fabric.ERROR in lyrik_images:
+            print('Not syncing, no connection to Lyrik.')
+            return
+
+        local_videos = self.local.content_videos()
+
+        lyrik_missing = list(set(local_videos) - set(lyrik_videos))
+
+        lyrik_missing = [os.path.join(self.local.video_folder, fn) for fn in lyrik_missing]
+
+        self.lyrik.upload(self.lyrik.content_videos_folder, lyrik_missing)
