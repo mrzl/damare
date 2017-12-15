@@ -18,6 +18,7 @@ class Lyrik(object):
         self.style_images_folder = '/home/marcel/drive/marcel/damare/1_FAST_NEURAL_STYLE_IMAGES/'
         self.content_videos_folder = '/home/marcel/drive/marcel/damare/2_CONTENT_VIDEOS/'
         self.finished_videos_folder = '/home/marcel/drive/marcel/damare/3_FINISHED/'
+        self.scheduler_jobs_folder = '/opt/scheduler/jobs/'
 
     def models(self):
         file_list = self.fabric.ls(self.style_model_folder)
@@ -38,6 +39,11 @@ class Lyrik(object):
                 only_images.append(file)
 
         return only_images
+
+    def train(self, style_image, style_size, content_weight, style_weight):
+        style = style_image[:-3]
+        style_job_filename = 'train_' + style + '.sh'
+        self.fabric.touch(os.path.join(self.scheduler_jobs_folder, style_job_filename))
 
     async def upload(self, destination_dir, files):
         for file in files:

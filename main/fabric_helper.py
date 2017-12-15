@@ -27,6 +27,15 @@ class FabricHelper(object):
     def pip_v(self):
         return run("pip -V")
 
+    def echo(self, file_path, str):
+        return run('echo \"' + str + '\" > ' + file_path)
+
+    def touch(self, file_path):
+        return run('touch ' + file_path)
+
+    def chmod(self, file_path, permissions):
+        return run('chmod ' + str(permissions) + ' ' + file_path)
+
     def ls(self, dir):
         """
         returns a list of absolute paths of files in the dir

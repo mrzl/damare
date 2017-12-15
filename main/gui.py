@@ -65,8 +65,11 @@ class Window(object):
         self.style_weight_entry.insert(0, 5.0)
 
         def train():
-            # do training
-            pass
+            style_image = self.selected_style.get()
+            style_size = self.image_size_entry.get()
+            content_weight = self.content_weight_entry.get()
+            style_weight = self.style_weight_entry.get()
+            self.lyrik.train(style_image, style_size, content_weight, style_weight)
 
         # train button
         self.train_button = tk.Button(self.root, text='train!', command=train).grid(row=7, column=2)
