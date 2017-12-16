@@ -12,9 +12,9 @@ class FabricHelper(object):
         self.ERROR = 'NetworkError'
         #with cd(self._home_dir):
 
-    async def upload(self, origin, destination):
+    def upload(self, origin, destination):
         try:
-            await put(origin, destination, use_sudo=False, mirror_local_mode=True)
+            put(origin, destination, use_sudo=False, mirror_local_mode=True)
         except NetworkError as e:
             print(e)
 

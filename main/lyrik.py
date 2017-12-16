@@ -85,9 +85,9 @@ class Lyrik(object):
         self.fabric.echo(render_job_path, '#!/bin/bash\nsource /home/marcel/.bashrc\n\ncd' + self._fast_artistic_style_folder + '\nbash fast_stylize.sh '+self.content_videos_folder+content_video+' ' +self.style_model_folder+style_file+'\nbash opt_flow.sh '+video+'/frame_%06d.ppm '+video+'/flow_'+resolution_split[0]+'\\:'+resolution_split[1]+'/\nbash make_video.sh '+self.content_videos_folder+content_video+'\n\ncd /home/marcel/devel/waifu2x/\nfind '+self._fast_artistic_style_folder+video+'/ -name "out-*.png" | sort > image_list_temp.txt\nmkdir '+self._fast_artistic_style_folder+video+'/high\n\n/mnt/drive1/tools/torch2/install/bin/th waifu2x.lua -m noise_scale -noise_level 3 -force_cudnn 1 -l ./image_list_temp.txt -o '+self._fast_artistic_style_folder+video+'/high/out_high_%06d.png\n\n/usr/bin/ffmpeg -y -framerate '+fps + ' -i '+self._fast_artistic_style_folder+'/high/out_high_%06d.png '+self.finished_videos_folder+style+'_'+video+www+'_'+fps+'.mp4\n\nrm -r '+self._fast_artistic_style_folder+video+'\nrm -r '+self._fast_artistic_style_folder+video+'_1\nrm '+self._fast_artistic_style_folder+video+'-stylized.mp4\n')
         self.fabric.chmod(render_job_path, 'a+x')
 
-    async def upload(self, destination_dir, files):
+    def upload(self, destination_dir, files):
         for file in files:
-            await self.fabric.upload(file, destination_dir)
+            self.fabric.upload(file, destination_dir)
 
     def uname(self):
         return self.fabric.uname()
