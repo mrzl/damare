@@ -61,7 +61,8 @@ class Lyrik(object):
                                          'train.lua -h5_file '+self.style_model_folder +
                                          'new_trained_output_all_coco.h5 -style_image ' + self.style_images_folder
                          + style_image+' -style_image_size ' + style_size+' -content_weights '
-                         + content_weight+' -style_weights ' + style_weight+' -checkpoint_name ' + style+' -gpu 0\n')
+                         + content_weight+' -style_weights ' + style_weight+' -checkpoint_name ' + style+' -gpu 0\n'
+                         + 'mv '+style+'* ' + self.style_model_folder)
         self.fabric.chmod(style_job_path, 'a+x')
 
     def render(self, content_video, style_file, resolution, do_waifu, fps):
