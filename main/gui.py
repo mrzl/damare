@@ -154,7 +154,7 @@ class Window(object):
         local_images = self.local.style_images()
         self.logger('got local list')
         lyrik_missing = list(set(local_images) - set(lyrik_images))
-        self.logger('some processing')
+        self.logger('some '+str(lyrik_missing)+' processing')
         lyrik_missing = [os.path.join(self.local.images_folder, fn) for fn in lyrik_missing]
         self.logger('start uploading images')
         self.lyrik.upload(self.lyrik.style_images_folder, lyrik_missing)
@@ -172,7 +172,7 @@ class Window(object):
         local_videos = self.local.content_videos()
         self.logger('got local list')
         lyrik_missing = list(set(local_videos) - set(lyrik_videos))
-        self.logger('some processing..')
+        self.logger('syncing '+str(lyrik_missing)+' some processing..')
         lyrik_missing = [os.path.join(self.local.video_folder, fn) for fn in lyrik_missing]
         self.logger('started uploading videos')
         self.lyrik.upload(self.lyrik.content_videos_folder, lyrik_missing)
