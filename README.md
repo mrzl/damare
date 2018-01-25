@@ -1,3 +1,5 @@
+![screenshot](https://raw.githubusercontent.com/mrzl/neurodynamics/master/img/screenshot01.jpg)
+
 #### install
 
     mkvirtualenv damare
