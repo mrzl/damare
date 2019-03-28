@@ -56,8 +56,8 @@ class Lyrik(object):
         style_job_filename = 'train_' + style + '.sh'
         style_job_path = os.path.join(self.scheduler_jobs_folder, style_job_filename)
         self.fabric.touch(style_job_path)
-        self.fabric.echo(style_job_path, '#!/bin/sh\nsource /home/marcel/.bashrc\n\ncd '
-                                         '~/devel/fast-neural-style/\n/mnt/drive1/tools/torch2/install/bin/th '
+        self.fabric.echo(style_job_path, '#!/bin/bash\nsource /home/marcel/.bashrc\nexport CUDNN_PATH="/usr/local/cuda/lib64/libcudnn.so.7"\n\ncd '
+                                         '/home/marcel/devel/fast-neural-style/\n/mnt/drive1/tools/torch2/install/bin/th '
                                          'train.lua -h5_file '+self.style_model_folder +
                                          'new_trained_output_all_coco.h5 -style_image ' + self.style_images_folder
                          + style_image+' -style_image_size ' + style_size+' -content_weights '
